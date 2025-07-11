@@ -14,6 +14,7 @@
       align-items: center;
       padding-top: 30px;
       margin: 0;
+      min-height: 100vh;
     }
     .flashcard {
       background: white;
@@ -26,9 +27,6 @@
     .question {
       font-size: 64px;
       margin-bottom: 20px;
-    }
-    .input-mode {
-      margin-top: 10px;
     }
     .input-mode input {
       padding: 10px;
@@ -44,25 +42,36 @@
     }
     .controls, .group-select {
       margin-top: 20px;
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
     }
     button, select {
       font-family: 'Noto Sans', sans-serif;
-      padding: 10px 20px;
+      padding: 10px 16px;
       font-size: 16px;
       border: none;
       background: #007bff;
       color: white;
       border-radius: 8px;
       cursor: pointer;
-      transition: background 0.3s;
+      transition: all 0.3s ease;
     }
     button:hover, select:hover {
-      background: #C0C0C0;
+      background: #0056b3;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
     }
     select {
       background: white;
       color: #333;
       border: 1px solid #ccc;
+    }
+    .button-label {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
   </style>
 </head>
@@ -70,107 +79,116 @@
   <div class="group-select">
     <label for="group">Chọn nhóm:</label>
     <select id="group" onchange="selectGroup()">
+      <option value="all" selected>Tất cả</option>
       <option value="a">a - i - u - e - o</option>
       <option value="ka">ka - ki - ku - ke - ko</option>
       <option value="sa">sa - shi - su - se - so</option>
-	  <option value="ta">ta - chi - tsu - te - to</option>
-	  <option value="na">na - ni - nu - ne - no</option>
-	  <option value="ha">ha - hi - fu - he - ho</option>
-      <option value="all" selected>Tất cả</option>
+      <option value="ta">ta - chi - tsu - te - to</option>
+      <option value="na">na - ni - nu - ne - no</option>
     </select>
   </div>
   <div class="group-select">
-    <label for="modeFilter">Chế độ:</label>
-    <select id="modeFilter" onchange="selectGroup()">
-      <option value="all" selected>Tất cả</option>
-      <option value="single">Chữ đơn</option>
+    <label for="mode">Chế độ:</label>
+    <select id="mode" onchange="selectGroup()">
+      <option value="single" selected>Chữ cái</option>
       <option value="compound">Từ ghép</option>
     </select>
   </div>
 
   <div class="flashcard">
-    <div class="question" id="question">Đang tải...</div>
-    <div class="input-mode" id="input-mode">
-      <input type="text" id="answerInput" placeholder="Nhập cách đọc..." onkeydown="handleKey(event)" />
+    <div class="question" id="question">Loading...</div>
+    <div class="input-mode">
+      <input type="text" id="answerInput" placeholder="Nhập đáp án..." onkeydown="handleKey(event)" />
     </div>
     <div class="feedback" id="feedback"></div>
     <div class="controls">
-      <button onclick="shuffleQuestions()">🔄 Xáo trộn câu hỏi</button>
+      <button onclick="toggleDirection()">
+        <div class="button-label">
+          Chuyển Hiragana ⇄ Romaji
+          <span id="dirLabel">Hira → Roma</span>
+        </div>
+      </button>
+      <button onclick="shuffleQuestions()">🔄 Xáo trộn</button>
     </div>
   </div>
 
   <script>
-    const allQuizData = [
-      { romaji: "a", correct: "あ", group: "a" },
-      { romaji: "i", correct: "い", group: "a" },
-      { romaji: "u", correct: "う", group: "a" },
-      { romaji: "e", correct: "え", group: "a" },
-      { romaji: "o", correct: "お", group: "a" },
-      { romaji: "ka", correct: "か", group: "ka" },
-      { romaji: "ki", correct: "き", group: "ka" },
-      { romaji: "ku", correct: "く", group: "ka" },
-      { romaji: "ke", correct: "け", group: "ka" },
-      { romaji: "ko", correct: "こ", group: "ka" },
-      { romaji: "sa", correct: "さ", group: "sa" },
-      { romaji: "shi", correct: "し", group: "sa" },
-      { romaji: "su", correct: "す", group: "sa" },
-      { romaji: "se", correct: "せ", group: "sa" },
-      { romaji: "so", correct: "そ", group: "sa" },
-	  { romaji: "ta", correct: "た", group: "ta" },
-	  { romaji: "chi", correct: "ち", group: "ta" },
-	  { romaji: "tsu", correct: "つ", group: "ta" },
-	  { romaji: "te", correct: "て", group: "ta" },
-	  { romaji: "to", correct: "と", group: "ta" },
-	  { romaji: "na", correct: "な", group: "na" },
-	  { romaji: "ni", correct: "に", group: "na" },
-	  { romaji: "nu", correct: "ぬ", group: "na" },
-	  { romaji: "ne", correct: "ね", group: "na" },
-	  { romaji: "no", correct: "の", group: "na" },
-	  { romaji: "ha", correct: "は", group: "ha" },
-	  { romaji: "hi", correct: "ひ", group: "ha" },
-	  { romaji: "fu", correct: "ふ", group: "ha" },
-	  { romaji: "he", correct: "へ", group: "ha" },
-	  { romaji: "ho", correct: "ほ", group: "ha" },
-	  { romaji: "sukina", correct: "すきな", group: "compound", type: "compound" },
-	  { romaji: "kakiko", correct: "かきこ", group: "compound", type: "compound" },
-	  { romaji: "nuhona", correct: "ぬほな", group: "compound", type: "compound" },
-	  { romaji: "tenohi", correct: "てのひ", group: "compound", type: "compound" },
-	  { romaji: "akanai", correct: "あかない", group: "compound", type: "compound" },
-	  { romaji: "kashiko", correct: "かしこ", group: "compound", type: "compound" },
-	  { romaji: "hokute", correct: "ほくて", group: "compound", type: "compound" },
-	  { romaji: "tatano", correct: "たたの", group: "compound", type: "compound" },
-	  { romaji: "suhite", correct: "すひて", group: "compound", type: "compound" },
-	  { romaji: "fukano", correct: "ふかの", group: "compound", type: "compound" },
-	  { romaji: "anashi", correct: "あなし", group: "compound", type: "compound" },
-	  { romaji: "shikiko", correct: "しきこ", group: "compound", type: "compound" },
-	  { romaji: "nukenai", correct: "ぬけない", group: "compound", type: "compound" },
-	  { romaji: "hitote", correct: "ひとて", group: "compound", type: "compound" },
-	  { romaji: "sosako", correct: "そさこ", group: "compound", type: "compound" },
-	  { romaji: "kineko", correct: "きねこ", group: "compound", type: "compound" },
-	  { romaji: "hoheta", correct: "ほへた", group: "compound", type: "compound" },
-	  { romaji: "fusako", correct: "ふさこ", group: "compound", type: "compound" },
-	  { romaji: "uchihe", correct: "うちへ", group: "compound", type: "compound" },
-	  { romaji: "tanaka", correct: "たなか", group: "compound", type: "compound" },
-	  { romaji: "notaki", correct: "のたき", group: "compound", type: "compound" },
-	  { romaji: "hineko", correct: "ひねこ", group: "compound", type: "compound" },
-	  { romaji: "tekane", correct: "てかね", group: "compound", type: "compound" },
-	  { romaji: "ashika", correct: "あしか", group: "compound", type: "compound" },
-	  { romaji: "fukashi", correct: "ふかし", group: "compound", type: "compound" },
-	  { romaji: "kokona", correct: "ここな", group: "compound", type: "compound" },
-	  { romaji: "kitete", correct: "きてて", group: "compound", type: "compound" },
-	  { romaji: "hehena", correct: "へへな", group: "compound", type: "compound" },
-	  { romaji: "takanu", correct: "たかぬ", group: "compound", type: "compound" },
-	  { romaji: "sashiko", correct: "さしこ", group: "compound", type: "compound" },
-
+    const hiraganaData = [
+      { romaji: "a", hiragana: "あ", group: "a" },
+      { romaji: "i", hiragana: "い", group: "a" },
+      { romaji: "u", hiragana: "う", group: "a" },
+      { romaji: "e", hiragana: "え", group: "a" },
+      { romaji: "o", hiragana: "お", group: "a" },
+      { romaji: "ka", hiragana: "か", group: "ka" },
+      { romaji: "ki", hiragana: "き", group: "ka" },
+      { romaji: "ku", hiragana: "く", group: "ka" },
+      { romaji: "ke", hiragana: "け", group: "ka" },
+      { romaji: "ko", hiragana: "こ", group: "ka" },
+      { romaji: "sa", hiragana: "さ", group: "sa" },
+      { romaji: "shi", hiragana: "し", group: "sa" },
+      { romaji: "su", hiragana: "す", group: "sa" },
+      { romaji: "se", hiragana: "せ", group: "sa" },
+      { romaji: "so", hiragana: "そ", group: "sa" },
+      { romaji: "ta", hiragana: "た", group: "ta" },
+      { romaji: "chi", hiragana: "ち", group: "ta" },
+      { romaji: "tsu", hiragana: "つ", group: "ta" },
+      { romaji: "te", hiragana: "て", group: "ta" },
+      { romaji: "to", hiragana: "と", group: "ta" },
+      { romaji: "na", hiragana: "な", group: "na" },
+      { romaji: "ni", hiragana: "に", group: "na" },
+      { romaji: "nu", hiragana: "ぬ", group: "na" },
+      { romaji: "ne", hiragana: "ね", group: "na" },
+      { romaji: "no", hiragana: "の", group: "na" }
     ];
 
-    let allCurrentSet = [];
-    let quizData = [];
+    const basicRomaji = hiraganaData.map(e => e.romaji);
+
+    function isValidWord(word, validRomajiList) {
+      const sorted = [...validRomajiList].sort((a, b) => b.length - a.length);
+      let i = 0;
+      while (i < word.length) {
+        let matched = false;
+        for (let key of sorted) {
+          if (word.slice(i, i + key.length) === key) {
+            i += key.length;
+            matched = true;
+            break;
+          }
+        }
+        if (!matched) return false;
+      }
+      return true;
+    }
+
+    const romajiToHiragana = s => {
+      for (let { romaji, hiragana } of [...hiraganaData].sort((a, b) => b.romaji.length - a.romaji.length)) {
+        s = s.replace(new RegExp(romaji, 'g'), hiragana);
+      }
+      return s;
+    };
+
+    const rawWords = [
+      "aikuko", "kikuso", "sukiko", "kaisha", "sashimi", "takuno", "tateto", "kakiku", "ninete", "nankai",
+      "kutsuo", "kakuso", "shiteko", "sakanano", "tokini", "sushika", "tenuki", "kofuku", "natsui", "sochira",
+      "kaiten", "nouten", "tekito", "sokudo", "shinko", "takara", "tonari", "nanika", "keiken", "sugoi"
+    ];
+
+    const filteredRomajiWords = rawWords.filter(word => isValidWord(word, basicRomaji));
+
+    const compoundWords = filteredRomajiWords.map(word => ({
+      romaji: word,
+      hiragana: romajiToHiragana(word),
+      group: "compound"
+    }));
+
+    let currentSet = [];
     let currentIndex = 0;
+    let modeDirection = "ja2ro";
 
     const questionEl = document.getElementById("question");
-    const feedbackEl = document.getElementById("feedback");
     const answerInput = document.getElementById("answerInput");
+    const feedbackEl = document.getElementById("feedback");
+    const dirLabel = document.getElementById("dirLabel");
 
     function shuffle(array) {
       for (let i = array.length - 1; i > 0; i--) {
@@ -179,56 +197,57 @@
       }
     }
 
-    function shuffleQuestions() {
-      shuffle(allCurrentSet);
-      quizData = [...allCurrentSet];
+    function toggleDirection() {
+      modeDirection = modeDirection === "ja2ro" ? "ro2ja" : "ja2ro";
+      dirLabel.textContent = modeDirection === "ja2ro" ? "Hira → Roma" : "Roma → Hira";
       currentIndex = 0;
       loadQuestion();
     }
 
     function selectGroup() {
       const group = document.getElementById("group").value;
-      const mode = document.getElementById("modeFilter").value;
-      allCurrentSet = allQuizData.filter(q => {
-        const groupMatch = group === "all" || q.group === group;
-        const modeMatch =
-          mode === "all" ||
-          (mode === "compound" && q.type === "compound") ||
-          (mode === "single" && (!q.type || q.type !== "compound"));
-        return groupMatch && modeMatch;
-      });
-      shuffleQuestions();
+      const mode = document.getElementById("mode").value;
+
+      if (mode === "compound") {
+        currentSet = [...compoundWords];
+      } else {
+        currentSet = hiraganaData.filter(q => group === "all" || q.group === group);
+      }
+
+      shuffle(currentSet);
+      currentIndex = 0;
+      loadQuestion();
     }
 
     function loadQuestion() {
-      const current = quizData[currentIndex];
-      questionEl.textContent = current.correct;
+      const current = currentSet[currentIndex];
       feedbackEl.textContent = "";
+      questionEl.textContent = modeDirection === "ro2ja" ? current.romaji : current.hiragana;
       answerInput.value = "";
       answerInput.focus();
     }
 
     function checkAnswer(input) {
-      const correct = quizData[currentIndex].romaji.trim().toLowerCase();
-      if (input.trim().toLowerCase() === correct) {
-        feedbackEl.textContent = "✅ Đúng rồi!";
-      } else {
-        feedbackEl.textContent = `❌ Sai, đúng là: ${correct}`;
-      }
+      const current = currentSet[currentIndex];
+      const correct = modeDirection === "ro2ja" ? current.hiragana : current.romaji;
+      feedbackEl.textContent = input.trim().toLowerCase() === correct
+        ? "✅ Đúng rồi!"
+        : `❌ Sai, đúng là: ${correct}`;
       setTimeout(() => {
         currentIndex++;
-        if (currentIndex >= quizData.length) {
-          shuffleQuestions();
-        } else {
-          loadQuestion();
-        }
+        if (currentIndex >= currentSet.length) shuffleQuestions();
+        else loadQuestion();
       }, 1200);
     }
 
     function handleKey(e) {
-      if (e.key === "Enter") {
-        checkAnswer(answerInput.value);
-      }
+      if (e.key === "Enter") checkAnswer(answerInput.value);
+    }
+
+    function shuffleQuestions() {
+      shuffle(currentSet);
+      currentIndex = 0;
+      loadQuestion();
     }
 
     selectGroup();
