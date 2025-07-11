@@ -85,6 +85,7 @@
       <option value="sa">sa - shi - su - se - so</option>
       <option value="ta">ta - chi - tsu - te - to</option>
       <option value="na">na - ni - nu - ne - no</option>
+	  <option value="ha">ha - hi - fu - he - ho</option>
     </select>
   </div>
   <div class="group-select">
@@ -138,7 +139,12 @@
       { romaji: "ni", hiragana: "に", group: "na" },
       { romaji: "nu", hiragana: "ぬ", group: "na" },
       { romaji: "ne", hiragana: "ね", group: "na" },
-      { romaji: "no", hiragana: "の", group: "na" }
+      { romaji: "no", hiragana: "の", group: "na" },
+	  { romaji: "ha", hiragana: "は", group: "ha" },
+	  { romaji: "hi", hiragana: "ひ", group: "ha" },
+	  { romaji: "fu", hiragana: "ふ", group: "ha" },
+	  { romaji: "he", hiragana: "へ", group: "ha" },
+	  { romaji: "ho", hiragana: "ほ", group: "ha" }
     ];
 
     const basicRomaji = hiraganaData.map(e => e.romaji);
@@ -170,7 +176,8 @@
     const rawWords = [
       "aikuko", "kikuso", "sukiko", "kaisha", "sashimi", "takuno", "tateto", "kakiku", "ninete", "nankai",
       "kutsuo", "kakuso", "shiteko", "sakanano", "tokini", "sushika", "tenuki", "kofuku", "natsui", "sochira",
-      "kaiten", "nouten", "tekito", "sokudo", "shinko", "takara", "tonari", "nanika", "keiken", "sugoi"
+      "kaiten", "nouten", "tekito", "sokudo", "shinko", "takara", "tonari", "nanika", "keiken", "sugoi", "hahana", "hafuto",
+	  "hiheho", "hofuna", "fuhaho"
     ];
 
     const filteredRomajiWords = rawWords.filter(word => isValidWord(word, basicRomaji));
