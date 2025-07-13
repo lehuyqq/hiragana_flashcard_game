@@ -349,6 +349,7 @@
     }));
 
     let currentSet = [];
+	let unusedIndices = [];
     let currentIndex = 0;
     let modeDirection = "ja2ro";
 
@@ -391,18 +392,29 @@
       feedbackEl.textContent = input.trim().toLowerCase() === correct ? "✅ Đúng rồi!" : `❌ Sai, đúng là: ${correct}`;
       setTimeout(() => {
         currentIndex = (currentIndex + 1) % currentSet.length;
-        loadQuestion();
+        nextQuestion();
       }, 1200);
     }
 
     function handleKey(e) {
       if (e.key === "Enter") checkAnswer(answerInput.value);
     }
+	
+	function nextQuestion() {
+      if (unusedIndices.length === 0) {
+       shuffleQuestions(); // Khi hết từ chưa dùng, xáo trộn lại
+       return;
+      }
+      const randIndex = Math.floor(Math.random() * unusedIndices.length);
+       currentIndex = unusedIndices.splice(randIndex, 1)[0]; // Lấy và loại khỏi danh sách
+       loadQuestion();
+    }
 
+	
     function shuffleQuestions() {
       shuffle(currentSet);
-      currentIndex = 0;
-      loadQuestion();
+      unusedIndices = currentSet.map((_, i) => i);
+      nextQuestion();
     }
 
     function toggleKanaTable() {
