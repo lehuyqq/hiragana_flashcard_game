@@ -402,8 +402,8 @@
 	
 	function nextQuestion() {
       if (unusedIndices.length === 0) {
+	   unusedIndices = currentSet.map((_, i) => i);
        shuffleQuestions(); // Khi hết từ chưa dùng, xáo trộn lại
-       return;
       }
 	  currentIndex = unusedIndices.pop();
 	  loadQuestion();
