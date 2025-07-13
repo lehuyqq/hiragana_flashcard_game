@@ -411,8 +411,8 @@
 
 	
     function shuffleQuestions() {
+	  unusedIndices = currentSet.map((_, i) => i);
       shuffle(unusedIndices);
-      unusedIndices = currentSet.map((_, i) => i);
       nextQuestion();
     }
 
