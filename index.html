@@ -405,14 +405,13 @@
        shuffleQuestions(); // Khi hết từ chưa dùng, xáo trộn lại
        return;
       }
-      const randIndex = Math.floor(Math.random() * unusedIndices.length);
-       currentIndex = unusedIndices.splice(randIndex, 1)[0]; // Lấy và loại khỏi danh sách
-       loadQuestion();
+	  currentIndex = unusedIndices.pop();
+	  loadQuestion();
     }
 
 	
     function shuffleQuestions() {
-      shuffle(currentSet);
+      shuffle(unusedIndices);
       unusedIndices = currentSet.map((_, i) => i);
       nextQuestion();
     }
