@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hiragana Flashcard Game</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&family=Noto+Sans+JP:wght@400;700&family=Noto+Serif+JP&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-color: #f9f9f9;
+      --text-color: #000;
+      --input-bg: #fff;
+      --select-bg: #fff;
+      --select-text: #000;
+      --card-bg: #ffffff;
+      --table-border: #ccc;
+    }
+
+    body.dark {
+      --bg-color: #1e1e1e;
+      --text-color: #fff;
+      --input-bg: #333;
+      --select-bg: #444;
+      --select-text: #fff;
+      --card-bg: #2f2f2f;
+      --table-border: #555;
+    }
+
+    body {
+      font-family: 'Noto Sans', sans-serif;
+      background: var(--bg-color);
+      color: var(--text-color);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 0;
+      min-height: 100vh;
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+
+    .top-controls {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 20px;
+    }
+
+    .group-select {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    select {
+      font-family: 'Noto Sans', sans-serif;
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      background: var(--select-bg);
+      color: var(--select-text);
+    }
+
+    .dark-mode-toggle, .kana-table-toggle {
+      position: fixed;
+      top: 16px;
+      font-size: 18px;
+      background: none;
+      border: 1px solid var(--text-color);
+      border-radius: 20px;
+      padding: 6px 12px;
+      cursor: pointer;
+      color: inherit;
+      transition: background 0.2s;
+    }
+
+    .dark-mode-toggle {
+      right: 16px;
+    }
+
+    .kana-table-toggle {
+      right: 70px;
+    }
+
+    .main-content {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      gap: 20px;
+      width: 100%;
+      max-width: 1000px;
+      margin-top: 30px;
+      padding: 0 20px;
+    }
+
+    .flashcard {
+      background: var(--card-bg);
+      width: 400px;
+      height: 300px;
+	  margin-top: 60px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      border-radius: 20px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    .question {
+      font-size: 64px;
+      margin-bottom: 20px;
+    }
+
+    .jp-text {
+      font-family: 'Meiryo', sans-serif;
+    }
+
+    .input-mode input {
+      padding: 10px;
+      font-size: 20px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      width: 200px;
+      text-align: center;
+      background: var(--input-bg);
+      color: var(--text-color);
+    }
+
+    .feedback {
+      margin-top: 10px;
+      font-size: 20px;
+    }
+
+    .controls {
+      margin-top: 10px;
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .controls button {
+      font-family: 'Noto Sans', sans-serif;
+      padding: 10px 16px;
+      font-size: 16px;
+      border: none;
+      background: #007bff;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .controls button:hover {
+      background: #0056b3;
+    }
+
+    .kana-table-container {
+      flex-shrink: 0;
+      width: 500px;
+      max-height: 800px;
+      overflow-y: auto;
+      background: var(--card-bg);
+      padding: 16px;
+      border-radius: 10px;
+      border: 2px solid var(--table-border);
+      display: none;
+    }
+
+    .kana-table-container table {
+      border-collapse: collapse;
+      width: 100%;
+      font-size: 30px;
+      text-align: center;
+    }
+
+    .kana-table-container th,
+    .kana-table-container td {
+      border: 1px solid var(--table-border);
+      padding: 6px;
+    }
+
+    .kana-table-container td {
+      font-size: 30px;
+    }
+  </style>
+</head>
+<body>
+  <button class="dark-mode-toggle" id="modeToggle" onclick="toggleDarkMode()">🌙</button>
+  <button class="kana-table-toggle" onclick="toggleKanaTable()">📖</button>
+
+  <div class="top-controls">
+    <div class="group-select">
+      <label for="group">Chọn nhóm:</label>
+      <select id="group" onchange="selectGroup()">
+        <option value="all" selected>Tất cả</option>
+        <option value="a">a - i - u - e - o</option>
+        <option value="ka">ka - ki - ku - ke - ko</option>
+        <option value="sa">sa - shi - su - se - so</option>
+        <option value="ta">ta - chi - tsu - te - to</option>
+        <option value="na">na - ni - nu - ne - no</option>
+        <option value="ha">ha - hi - fu - he - ho</option>
+        <option value="ma">ma - mi - mu - me - mo</option>
+        <option value="ya">ya - yu - yo</option>
+        <option value="ra">ra - ri - ru - re - ro</option>
+        <option value="wa">wa - wo - n</option>
+      </select>
+    </div>
+
+    <div class="group-select">
+      <label for="mode">Chế độ:</label>
+      <select id="mode" onchange="selectGroup()">
+        <option value="single" selected>Chữ cái</option>
+        <option value="compound">Từ ghép</option>
+      </select>
+    </div>
+
+    <div class="group-select">
+      <label for="jpFont">Font tiếng Nhật:</label>
+      <select id="jpFont" onchange="updateJapaneseFont()">
+        <option value="'Meiryo', sans-serif">Meiryo</option>
+        <option value="'Noto Serif JP', serif">Noto Serif JP</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="main-content">
+    <div class="flashcard">
+      <div class="question jp-text" id="question">Loading...</div>
+      <div class="input-mode">
+        <input type="text" id="answerInput" placeholder="Nhập đáp án..." onkeydown="handleKey(event)" />
+      </div>
+      <div class="feedback" id="feedback"></div>
+      <div class="controls">
+        <button onclick="toggleDirection()">
+          <span id="dirLabel">Hiragana → Romaji</span>
+        </button>
+        <button onclick="shuffleQuestions()">🔄 Xáo trộn</button>
+      </div>
+    </div>
+
+    <div class="kana-table-container" id="kanaTable">
+      <table id="kanaTableContent">
+        <tr><th></th><th>a</th><th>i</th><th>u</th><th>e</th><th>o</th></tr>
+        <tr><td></td><td>あ</td><td>い</td><td>う</td><td>え</td><td>お</td></tr>
+        <tr><td>k</td><td>か</td><td>き</td><td>く</td><td>け</td><td>こ</td></tr>
+        <tr><td>s</td><td>さ</td><td>し</td><td>す</td><td>せ</td><td>そ</td></tr>
+        <tr><td>t</td><td>た</td><td>ち</td><td>つ</td><td>て</td><td>と</td></tr>
+        <tr><td>n</td><td>な</td><td>に</td><td>ぬ</td><td>ね</td><td>の</td></tr>
+        <tr><td>h</td><td>は</td><td>ひ</td><td>ふ</td><td>へ</td><td>ほ</td></tr>
+        <tr><td>m</td><td>ま</td><td>み</td><td>む</td><td>め</td><td>も</td></tr>
+        <tr><td>y</td><td>や</td><td></td><td>ゆ</td><td></td><td>よ</td></tr>
+        <tr><td>r</td><td>ら</td><td>り</td><td>る</td><td>れ</td><td>ろ</td></tr>
+        <tr><td>w</td><td>わ</td><td></td><td></td><td></td><td>を</td></tr>
+        <tr><td>n</td><td colspan="5">ん</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    const hiraganaData = [
+      { romaji: "a", hiragana: "あ", group: "a" },
+      { romaji: "i", hiragana: "い", group: "a" },
+      { romaji: "u", hiragana: "う", group: "a" },
+      { romaji: "e", hiragana: "え", group: "a" },
+      { romaji: "o", hiragana: "お", group: "a" },
+      { romaji: "ka", hiragana: "か", group: "ka" },
+      { romaji: "ki", hiragana: "き", group: "ka" },
+      { romaji: "ku", hiragana: "く", group: "ka" },
+      { romaji: "ke", hiragana: "け", group: "ka" },
+      { romaji: "ko", hiragana: "こ", group: "ka" },
+      { romaji: "sa", hiragana: "さ", group: "sa" },
+      { romaji: "shi", hiragana: "し", group: "sa" },
+      { romaji: "su", hiragana: "す", group: "sa" },
+      { romaji: "se", hiragana: "せ", group: "sa" },
+      { romaji: "so", hiragana: "そ", group: "sa" },
+      { romaji: "ta", hiragana: "た", group: "ta" },
+      { romaji: "chi", hiragana: "ち", group: "ta" },
+      { romaji: "tsu", hiragana: "つ", group: "ta" },
+      { romaji: "te", hiragana: "て", group: "ta" },
+      { romaji: "to", hiragana: "と", group: "ta" },
+      { romaji: "na", hiragana: "な", group: "na" },
+      { romaji: "ni", hiragana: "に", group: "na" },
+      { romaji: "nu", hiragana: "ぬ", group: "na" },
+      { romaji: "ne", hiragana: "ね", group: "na" },
+      { romaji: "no", hiragana: "の", group: "na" },
+      { romaji: "ha", hiragana: "は", group: "ha" },
+      { romaji: "hi", hiragana: "ひ", group: "ha" },
+      { romaji: "fu", hiragana: "ふ", group: "ha" },
+      { romaji: "he", hiragana: "へ", group: "ha" },
+      { romaji: "ho", hiragana: "ほ", group: "ha" },
+      { romaji: "ma", hiragana: "ま", group: "ma" },
+      { romaji: "mi", hiragana: "み", group: "ma" },
+      { romaji: "mu", hiragana: "む", group: "ma" },
+      { romaji: "me", hiragana: "め", group: "ma" },
+      { romaji: "mo", hiragana: "も", group: "ma" },
+      { romaji: "ya", hiragana: "や", group: "ya" },
+      { romaji: "yu", hiragana: "ゆ", group: "ya" },
+      { romaji: "yo", hiragana: "よ", group: "ya" },
+      { romaji: "ra", hiragana: "ら", group: "ra" },
+      { romaji: "ri", hiragana: "り", group: "ra" },
+      { romaji: "ru", hiragana: "る", group: "ra" },
+      { romaji: "re", hiragana: "れ", group: "ra" },
+      { romaji: "ro", hiragana: "ろ", group: "ra" },
+      { romaji: "wa", hiragana: "わ", group: "wa" },
+      { romaji: "wo", hiragana: "を", group: "wa" },
+      { romaji: "n", hiragana: "ん", group: "wa" },
+    ];
+
+    const rawWords = [
+      "arigato", "usagi", "neko", "inu", "sakura", "kumo", "hana", "ame", "yuki", "kaze",
+      "natsu", "haru", "aki", "fuyu", "mizu", "umi", "yama", "mori", "hoshi", "sora",
+      "hikari", "kokoro", "tomodachi", "ie", "kodomo", "tabemono", "nomimono", "mirai", "asatte", "otona"
+    ];
+
+    const romajiToHiragana = s => {
+      for (let { romaji, hiragana } of [...hiraganaData].sort((a, b) => b.romaji.length - a.romaji.length)) {
+        s = s.replace(new RegExp(romaji, 'g'), hiragana);
+      }
+      return s;
+    };
+
+    const basicRomaji = hiraganaData.map(e => e.romaji);
+
+    function isValidWord(word, validRomajiList) {
+      const sorted = [...validRomajiList].sort((a, b) => b.length - a.length);
+      let i = 0;
+      while (i < word.length) {
+        let matched = false;
+        for (let key of sorted) {
+          if (word.slice(i, i + key.length) === key) {
+            i += key.length;
+            matched = true;
+            break;
+          }
+        }
+        if (!matched) return false;
+      }
+      return true;
+    }
+
+    const filteredRomajiWords = rawWords.filter(word => isValidWord(word, basicRomaji));
+    const compoundWords = filteredRomajiWords.map(word => ({
+      romaji: word,
+      hiragana: romajiToHiragana(word),
+      group: "compound"
+    }));
+
+    let currentSet = [];
+	let unusedIndices = [];
+    let currentIndex = 0;
+    let modeDirection = "ja2ro";
+
+    const questionEl = document.getElementById("question");
+    const answerInput = document.getElementById("answerInput");
+    const feedbackEl = document.getElementById("feedback");
+    const dirLabel = document.getElementById("dirLabel");
+
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+    }
+
+    function toggleDirection() {
+      modeDirection = modeDirection === "ja2ro" ? "ro2ja" : "ja2ro";
+      dirLabel.textContent = modeDirection === "ja2ro" ? "Hiragana → Romaji" : "Romaji → Hiragana";
+      shuffleQuestions();
+    }
+
+    function selectGroup() {
+      const group = document.getElementById("group").value;
+      const mode = document.getElementById("mode").value;
+      currentSet = (mode === "compound") ? [...compoundWords] : hiraganaData.filter(q => group === "all" || q.group === group);
+      shuffleQuestions();
+    }
+
+    function loadQuestion() {
+      const current = currentSet[currentIndex];
+      feedbackEl.textContent = "";
+      questionEl.textContent = modeDirection === "ro2ja" ? current.romaji : current.hiragana;
+      answerInput.value = "";
+      answerInput.focus();
+    }
+
+    function checkAnswer(input) {
+      const current = currentSet[currentIndex];
+      const correct = modeDirection === "ro2ja" ? current.hiragana : current.romaji;
+      feedbackEl.textContent = input.trim().toLowerCase() === correct ? "✅ Đúng rồi!" : `❌ Sai, đúng là: ${correct}`;
+      setTimeout(() => {
+        currentIndex = (currentIndex + 1) % currentSet.length;
+        nextQuestion();
+      }, 1200);
+    }
+
+    function handleKey(e) {
+      if (e.key === "Enter") checkAnswer(answerInput.value);
+    }
+	
+	function nextQuestion() {
+      if (unusedIndices.length === 0) {
+	   unusedIndices = currentSet.map((_, i) => i);
+       shuffleQuestions(); // Khi hết từ chưa dùng, xáo trộn lại
+      }
+	  currentIndex = unusedIndices.pop();
+	  loadQuestion();
+    }
+
+	
+    function shuffleQuestions() {
+	  unusedIndices = currentSet.map((_, i) => i);
+      shuffle(unusedIndices);
+      nextQuestion();
+    }
+
+    function toggleKanaTable() {
+      const table = document.getElementById("kanaTable");
+      table.style.display = table.style.display === "block" ? "none" : "block";
+    }
+
+    function toggleDarkMode() {
+      document.body.classList.toggle("dark");
+      const isDark = document.body.classList.contains("dark");
+      localStorage.setItem("theme", isDark ? "dark" : "light");
+
+      const toggleButton = document.getElementById("modeToggle");
+      toggleButton.textContent = isDark ? "☀️" : "🌙";
+    }
+
+
+    window.addEventListener("DOMContentLoaded", () => {
+    const savedTheme = localStorage.getItem("theme");
+    const toggleButton = document.getElementById("modeToggle");
+
+      if (savedTheme === "dark") {
+       document.body.classList.add("dark");
+       toggleButton.textContent = "☀️";
+    } else {
+      toggleButton.textContent = "🌙";
+    }
+
+     selectGroup();
+    });
+
+
+    function updateJapaneseFont() {
+      const selectedFont = document.getElementById("jpFont").value;
+      document.getElementById("question").style.fontFamily = selectedFont;
+      document.getElementById("kanaTableContent").style.fontFamily = selectedFont;
+    }
+  </script>
+</body>
+</html>
