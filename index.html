@@ -158,8 +158,8 @@
 			
 			.kana-table-container {
 			flex-shrink: 0;
-			width: 500px;
-			max-height: 800px;
+			width: 400px;
+			max-height: 700px;
 			overflow-y: auto;
 			background: var(--card-bg);
 			padding: 16px;
@@ -184,6 +184,44 @@
 			.kana-table-container td {
 			font-size: 30px;
 			}
+			.custom-dropdown {
+			position: relative;
+			display: inline-block;
+			}
+			
+			.dropdown-btn {
+			padding: 8px 12px;
+			background: var(--select-bg);
+			color: var(--select-text);
+			border: 1px solid #ccc;
+			border-radius: 6px;
+			cursor: pointer;
+			font-size: 14px;
+			}
+			
+			.dropdown-content {
+			display: none;
+			position: absolute;
+			background-color: var(--card-bg);
+			min-width: 200px;
+			max-height: 300px;
+			overflow-y: auto;
+			box-shadow: 0px 2px 8px rgba(0,0,0,0.2);
+			padding: 8px;
+			border-radius: 8px;
+			z-index: 1000;
+			}
+			
+			.dropdown-content label {
+			display: block;
+			margin-bottom: 4px;
+			font-size: 14px;
+			}
+			
+			.custom-dropdown.open .dropdown-content {
+			display: block;
+			}
+			
 		</style>
 	</head>
 	<body>
@@ -192,20 +230,40 @@
 		
 		<div class="top-controls">
 			<div class="group-select">
-				<label for="group">Chọn nhóm:</label>
-				<select id="group" onchange="selectGroup()">
-					<option value="all" selected>Tất cả</option>
-					<option value="a">a - i - u - e - o</option>
-					<option value="ka">ka - ki - ku - ke - ko</option>
-					<option value="sa">sa - shi - su - se - so</option>
-					<option value="ta">ta - chi - tsu - te - to</option>
-					<option value="na">na - ni - nu - ne - no</option>
-					<option value="ha">ha - hi - fu - he - ho</option>
-					<option value="ma">ma - mi - mu - me - mo</option>
-					<option value="ya">ya - yu - yo</option>
-					<option value="ra">ra - ri - ru - re - ro</option>
-					<option value="wa">wa - wo - n</option>
-				</select>
+				<label>Chữ cái:</label>
+				<div class="custom-dropdown">
+					<button class="dropdown-btn" onclick="toggleDropdown('groupDropdown')">Nhóm ▼</button>
+					<div class="dropdown-content" id="groupDropdown">
+					    <label><input type="checkbox" name="group" value="all" checked> Tất cả</label>
+						<label><input type="checkbox" name="group" value="a"> a - i - u - e - o</label>
+						<label><input type="checkbox" name="group" value="ka"> ka - ki - ku - ke - ko</label>
+						<label><input type="checkbox" name="group" value="sa"> sa - shi - su - se - so</label>
+						<label><input type="checkbox" name="group" value="ta"> ta - chi - tsu - te - to</label>
+						<label><input type="checkbox" name="group" value="na"> na - ni - nu - ne - no</label>
+						<label><input type="checkbox" name="group" value="ha"> ha - hi - fu - he - ho</label>
+						<label><input type="checkbox" name="group" value="ma"> ma - mi - mu - me - mo</label>
+						<label><input type="checkbox" name="group" value="ya"> ya - yu - y</label>
+						<label><input type="checkbox" name="group" value="ra"> ra - ri - ru - re - ro</label>
+						<label><input type="checkbox" name="group" value="wa"> wa - wo - n</label>
+						<label><input type="checkbox" name="group" value="none"> Trống</label>
+					</div>
+				</div>
+			</div>
+			
+			<div class="group-select">
+				<label>Biến âm:</label>
+				<div class="custom-dropdown">
+					<button class="dropdown-btn" onclick="toggleDropdown('voicedDropdown')">Nhóm ▼</button>
+					<div class="dropdown-content" id="voicedDropdown">
+						<label><input type="checkbox" name="voicedGroup" value="all" checked> Tất cả</label>
+						<label><input type="checkbox" name="voicedGroup" value="ga"> ga - gi - gu - ge - go</label>
+						<label><input type="checkbox" name="voicedGroup" value="za"> za - ji - zu - ze - zo</label>
+						<label><input type="checkbox" name="voicedGroup" value="da"> da - ji - zu - de - do</label>
+						<label><input type="checkbox" name="voicedGroup" value="ba"> ba - bi - bu - be - bo</label>
+						<label><input type="checkbox" name="voicedGroup" value="pa"> pa - pi - pu - pe - po</label>
+						<label><input type="checkbox" name="voicedGroup" value="none"> Trống</label>
+					</div>
+				</div>
 			</div>
 			
 			<div class="group-select">
@@ -246,10 +304,15 @@
 					<tr><th></th><th>a</th><th>i</th><th>u</th><th>e</th><th>o</th></tr>
 					<tr><td></td><td>あ</td><td>い</td><td>う</td><td>え</td><td>お</td></tr>
 					<tr><td>k</td><td>か</td><td>き</td><td>く</td><td>け</td><td>こ</td></tr>
+					<tr><td>g</td><td>が</td><td>ぎ</td><td>ぐ</td><td>げ</td><td>ご</td></tr>
 					<tr><td>s</td><td>さ</td><td>し</td><td>す</td><td>せ</td><td>そ</td></tr>
+					<tr><td>z</td><td>ざ</td><td>じ</td><td>ず</td><td>ぜ</td><td>ぞ</td></tr>
 					<tr><td>t</td><td>た</td><td>ち</td><td>つ</td><td>て</td><td>と</td></tr>
+					<tr><td>d</td><td>だ</td><td>ぢ</td><td>づ</td><td>で</td><td>ど</td></tr>
 					<tr><td>n</td><td>な</td><td>に</td><td>ぬ</td><td>ね</td><td>の</td></tr>
 					<tr><td>h</td><td>は</td><td>ひ</td><td>ふ</td><td>へ</td><td>ほ</td></tr>
+					<tr><td>b</td><td>ば</td><td>び</td><td>ぶ</td><td>べ</td><td>ぼ</td></tr>
+					<tr><td>p</td><td>ぱ</td><td>ぴ</td><td>ぷ</td><td>ぺ</td><td>ぽ</td></tr>
 					<tr><td>m</td><td>ま</td><td>み</td><td>む</td><td>め</td><td>も</td></tr>
 					<tr><td>y</td><td>や</td><td></td><td>ゆ</td><td></td><td>よ</td></tr>
 					<tr><td>r</td><td>ら</td><td>り</td><td>る</td><td>れ</td><td>ろ</td></tr>
@@ -307,6 +370,36 @@
 			{ romaji: "wa", hiragana: "わ", group: "wa" },
 			{ romaji: "wo", hiragana: "を", group: "wa" },
 			{ romaji: "n", hiragana: "ん", group: "wa" },
+			
+			{ romaji: "ga", hiragana: "が", group: "ga" },
+			{ romaji: "gi", hiragana: "ぎ", group: "ga" },
+			{ romaji: "gu", hiragana: "ぐ", group: "ga" },
+			{ romaji: "ge", hiragana: "げ", group: "ga" },
+			{ romaji: "go", hiragana: "ご", group: "ga" },
+			
+			{ romaji: "za", hiragana: "ざ", group: "za" },
+			{ romaji: "ji", hiragana: "じ", group: "za" },
+			{ romaji: "zu", hiragana: "ず", group: "za" },
+			{ romaji: "ze", hiragana: "ぜ", group: "za" },
+			{ romaji: "zo", hiragana: "ぞ", group: "za" },
+			
+			{ romaji: "da", hiragana: "だ", group: "da" },
+			{ romaji: "ji", hiragana: "ぢ", group: "da" },
+			{ romaji: "zu", hiragana: "づ", group: "da" },
+			{ romaji: "de", hiragana: "で", group: "da" },
+			{ romaji: "do", hiragana: "ど", group: "da" },
+			
+			{ romaji: "ba", hiragana: "ば", group: "ba" },
+			{ romaji: "bi", hiragana: "び", group: "ba" },
+			{ romaji: "bu", hiragana: "ぶ", group: "ba" },
+			{ romaji: "be", hiragana: "べ", group: "ba" },
+			{ romaji: "bo", hiragana: "ぼ", group: "ba" },
+			
+			{ romaji: "pa", hiragana: "ぱ", group: "pa" },
+			{ romaji: "pi", hiragana: "ぴ", group: "pa" },
+			{ romaji: "pu", hiragana: "ぷ", group: "pa" },
+			{ romaji: "pe", hiragana: "ぺ", group: "pa" },
+			{ romaji: "po", hiragana: "ぽ", group: "pa" },
 			];
 			
 			const rawWords = [
@@ -372,40 +465,68 @@
 			}
 			
 			function selectGroup() {
-				const group = document.getElementById("group").value;
 				const mode = document.getElementById("mode").value;
 				const wordLengthContainer = document.getElementById("lengthContainer");
 				
-				// Hiển thị dropdown độ dài chỉ khi chọn chế độ "random"
+				// Hiển thị chọn độ dài từ ghép khi chọn "random"
 				if (wordLengthContainer) {
 					wordLengthContainer.style.display = mode === "random" ? "inline-block" : "none";
 				}
 				
 				const wordLength = parseInt(document.getElementById("lengthSelect")?.value || "3");
 				
+				// Lấy các nhóm được chọn từ checkbox
+				const selectedGroups = Array.from(document.querySelectorAll('input[name="group"]:checked')).map(cb => cb.value);
+				const selectedVoicedGroups = Array.from(document.querySelectorAll('input[name="voicedGroup"]:checked')).map(cb => cb.value);
+				
+				const baseKana = hiraganaData.filter(e =>
+				["a", "ka", "sa", "ta", "na", "ha", "ma", "ya", "ra", "wa"].includes(e.group)
+				);
+				const voicedKana = hiraganaData.filter(e =>
+				["ga", "za", "da", "ba", "pa"].includes(e.group)
+				);
+				
+				const baseFiltered = selectedGroups.includes("all")
+				? baseKana
+				: baseKana.filter(k => selectedGroups.includes(k.group));
+				
+				const voicedFiltered = selectedVoicedGroups.includes("all")
+				? voicedKana
+				: voicedKana.filter(k => selectedVoicedGroups.includes(k.group));
+				
 				if (mode === "compound") {
 					currentSet = [...compoundWords];
 					} else if (mode === "random") {
-					const characters = group === "all" ? hiraganaData : hiraganaData.filter(q => q.group === group);
-					currentSet = Array.from({ length: 50 }, () => {
-						const word = Array.from({ length: wordLength }, () => characters[Math.floor(Math.random() * characters.length)]);
-						return {
-							romaji: word.map(c => c.romaji).join(""),
-							hiragana: word.map(c => c.hiragana).join(""),
-							group: "random"
-						};
-					});
+					const all = [...baseFiltered, ...voicedFiltered];
+					if (all.length === 0) {
+						currentSet = [];
+						} else {
+						currentSet = Array.from({ length: 50 }, () => {
+							const word = Array.from({ length: wordLength }, () =>
+							all[Math.floor(Math.random() * all.length)]
+							);
+							return {
+								romaji: word.map(c => c.romaji).join(""),
+								hiragana: word.map(c => c.hiragana).join(""),
+								group: "random"
+							};
+						});
+					}
 					} else {
-					currentSet = hiraganaData.filter(q => group === "all" || q.group === group);
+					currentSet = [...baseFiltered, ...voicedFiltered];
 				}
 				
 				shuffleQuestions();
 			}
 			
 			
+			
+			
 			window.addEventListener("DOMContentLoaded", () => {
 				const savedTheme = localStorage.getItem("theme");
 				const toggleButton = document.getElementById("modeToggle");
+				handleGroupCheckboxLogic("group");
+                handleGroupCheckboxLogic("voicedGroup");
 				if (savedTheme === "dark") {
 					document.body.classList.add("dark");
 					toggleButton.textContent = "☀️";
@@ -507,6 +628,61 @@
 				document.getElementById("question").style.fontFamily = selectedFont;
 				document.getElementById("kanaTableContent").style.fontFamily = selectedFont;
 			}
+			function toggleDropdown(id) {
+				// Ẩn tất cả dropdown trước
+				document.querySelectorAll('.dropdown-content').forEach(d => {
+					if (d.id !== id) d.style.display = 'none';
+				});
+				
+				const dropdown = document.getElementById(id);
+				dropdown.style.display = (dropdown.style.display === "block") ? "none" : "block";
+			}
+			
+			
+			// Đóng dropdown khi click ngoài vùng
+			document.addEventListener('click', function (e) {
+				if (!e.target.closest('.custom-dropdown')) {
+					document.querySelectorAll('.custom-dropdown').forEach(dd => dd.classList.remove('open'));
+				}
+			});
+			function handleGroupCheckboxLogic(groupName) {
+				const checkboxes = document.querySelectorAll(`input[name="${groupName}"]`);
+				const allCheckbox = Array.from(checkboxes).find(cb => cb.value === "all");
+				
+				checkboxes.forEach(cb => {
+					cb.addEventListener("change", () => {
+						if (cb.value === "all" && cb.checked) {
+							checkboxes.forEach(c => {
+								if (c !== cb) c.checked = false;
+							});
+							} else if (cb.value !== "all" && cb.checked) {
+							allCheckbox.checked = false;
+						}
+						
+						// Không checkbox nào được chọn → bật lại "Tất cả"
+						const checkedCount = Array.from(checkboxes).filter(c => c.checked).length;
+						if (checkedCount === 0) {
+							allCheckbox.checked = true;
+						}
+						
+						selectGroup(); // Cập nhật
+					});
+				});
+			}
+			document.addEventListener("click", function (event) {
+				const isDropdownButton = event.target.matches(".dropdown-btn");
+				const dropdowns = document.querySelectorAll(".dropdown-content");
+				
+				dropdowns.forEach(dropdown => {
+					const parent = dropdown.parentElement;
+					if (!parent.contains(event.target) && !isDropdownButton) {
+						dropdown.style.display = "none";
+					}
+				});
+			});
+			
+			
+			
 		</script>
 	</body>
 </html>
