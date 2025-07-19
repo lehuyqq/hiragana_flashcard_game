@@ -204,7 +204,7 @@
 			position: absolute;
 			background-color: var(--card-bg);
 			min-width: 200px;
-			max-height: 300px;
+			max-height: 350px;
 			overflow-y: auto;
 			box-shadow: 0px 2px 8px rgba(0,0,0,0.2);
 			padding: 8px;
@@ -262,6 +262,27 @@
 						<label><input type="checkbox" name="voicedGroup" value="ba"> ba - bi - bu - be - bo</label>
 						<label><input type="checkbox" name="voicedGroup" value="pa"> pa - pi - pu - pe - po</label>
 						<label><input type="checkbox" name="voicedGroup" value="none"> Trống</label>
+					</div>
+				</div>
+			</div>
+			<div class="group-select">
+				<label>Âm Ghép:</label>
+				<div class="custom-dropdown">
+					<button class="dropdown-btn" onclick="toggleDropdown('connectCharDropdown')">Nhóm ▼</button>
+					<div class="dropdown-content" id="connectCharDropdown">
+						<label><input type="checkbox" name="connectChar" value="all" checked> Tất cả</label>
+						<label><input type="checkbox" name="connectChar" value="kya"> kya - kyu - kyo</label>
+						<label><input type="checkbox" name="connectChar" value="sha"> sha - shu - sho</label>
+						<label><input type="checkbox" name="connectChar" value="cha"> cha - chu - cho</label>
+						<label><input type="checkbox" name="connectChar" value="nya"> nya - nyu - nyo </label>
+						<label><input type="checkbox" name="connectChar" value="hya"> hya - hyu - hyo</label>
+						<label><input type="checkbox" name="connectChar" value="mya"> mya - myu - myo</label>
+						<label><input type="checkbox" name="connectChar" value="rya"> rya - ryu - ryo</label>
+						<label><input type="checkbox" name="connectChar" value="gya"> gya - gyu - gyo</label>
+						<label><input type="checkbox" name="connectChar" value="ja"> ja - ju - jo</label>
+						<label><input type="checkbox" name="connectChar" value="bya"> bya - byu - byo</label>
+						<label><input type="checkbox" name="connectChar" value="pya"> pya - pyu - pyo</label>
+						<label><input type="checkbox" name="connectChar" value="none"> Trống</label>
 					</div>
 				</div>
 			</div>
@@ -400,6 +421,50 @@
 			{ romaji: "pu", hiragana: "ぷ", group: "pa" },
 			{ romaji: "pe", hiragana: "ぺ", group: "pa" },
 			{ romaji: "po", hiragana: "ぽ", group: "pa" },
+			
+			{ romaji: "kya", hiragana: "きゃ", group: "kya" },
+			{ romaji: "kyu", hiragana: "きゅ", group: "kya" },
+			{ romaji: "kyo", hiragana: "きょ", group: "kya" },
+			
+			{ romaji: "sha", hiragana: "しゃ", group: "sha" },
+			{ romaji: "shu", hiragana: "しゅ", group: "sha" },
+			{ romaji: "sho", hiragana: "しょ", group: "sha" },
+			
+			{ romaji: "cha", hiragana: "ちゃ", group: "cha" },
+			{ romaji: "chu", hiragana: "ちゅ", group: "cha" },
+			{ romaji: "cho", hiragana: "ちょ", group: "cha" },
+			
+			{ romaji: "nya", hiragana: "にゃ", group: "nya" },
+			{ romaji: "nyu", hiragana: "にゅ", group: "nya" },
+			{ romaji: "nyo", hiragana: "にょ", group: "nya" },
+			
+			{ romaji: "hya", hiragana: "ひゃ", group: "hya" },
+			{ romaji: "hyu", hiragana: "ひゅ", group: "hya" },
+			{ romaji: "hyo", hiragana: "ひょ", group: "hya" },
+			
+			{ romaji: "mya", hiragana: "みゃ", group: "mya" },
+			{ romaji: "myu", hiragana: "みゅ", group: "mya" },
+			{ romaji: "myo", hiragana: "みょ", group: "mya" },
+			
+			{ romaji: "rya", hiragana: "りゃ", group: "rya" },
+			{ romaji: "ryu", hiragana: "りゅ", group: "rya" },
+			{ romaji: "ryo", hiragana: "りょ", group: "rya" },
+			
+			{ romaji: "gya", hiragana: "ぎゃ", group: "gya" },
+			{ romaji: "gyu", hiragana: "ぎゅ", group: "gya" },
+			{ romaji: "gyo", hiragana: "ぎょ", group: "gya" },
+			
+			{ romaji: "ja", hiragana: "じゃ", group: "ja" },
+			{ romaji: "ju", hiragana: "じゅ", group: "ja" },
+			{ romaji: "jo", hiragana: "じょ", group: "ja" },
+			
+			{ romaji: "bya", hiragana: "びゃ", group: "bya" },
+			{ romaji: "byu", hiragana: "びゅ", group: "bya" },
+			{ romaji: "byo", hiragana: "びょ", group: "bya" },
+			
+			{ romaji: "pya", hiragana: "ぴゃ", group: "pya" },
+			{ romaji: "pyu", hiragana: "ぴゅ", group: "pya" },
+			{ romaji: "pyo", hiragana: "ぴょ", group: "pya" },
 			];
 			
 			const rawWords = [
@@ -478,6 +543,7 @@
 				// Lấy các nhóm được chọn từ checkbox
 				const selectedGroups = Array.from(document.querySelectorAll('input[name="group"]:checked')).map(cb => cb.value);
 				const selectedVoicedGroups = Array.from(document.querySelectorAll('input[name="voicedGroup"]:checked')).map(cb => cb.value);
+				const selectedconnectChar = Array.from(document.querySelectorAll('input[name="connectChar"]:checked')).map(cb => cb.value);
 				
 				const baseKana = hiraganaData.filter(e =>
 				["a", "ka", "sa", "ta", "na", "ha", "ma", "ya", "ra", "wa"].includes(e.group)
@@ -485,19 +551,32 @@
 				const voicedKana = hiraganaData.filter(e =>
 				["ga", "za", "da", "ba", "pa"].includes(e.group)
 				);
+				const connectKana = hiraganaData.filter(e =>
+				["kya", "sha", "cha", "nya", "hya", "mya", "rya", "gya", "ja", "bya", "pya"].includes(e.group)
+				);
 				
 				const baseFiltered = selectedGroups.includes("all")
 				? baseKana
+				: selectedGroups.includes("none") || selectedGroups.length === 0
+				? []
 				: baseKana.filter(k => selectedGroups.includes(k.group));
 				
 				const voicedFiltered = selectedVoicedGroups.includes("all")
 				? voicedKana
+				: selectedVoicedGroups.includes("none") || selectedVoicedGroups.length === 0
+				? []
 				: voicedKana.filter(k => selectedVoicedGroups.includes(k.group));
+				
+				const connectFiltered = selectedconnectChar.includes("all")
+				? connectKana
+				: selectedconnectChar.includes("none") || selectedconnectChar.length === 0
+				? []
+				: connectKana.filter(k => selectedconnectChar.includes(k.group));
 				
 				if (mode === "compound") {
 					currentSet = [...compoundWords];
 					} else if (mode === "random") {
-					const all = [...baseFiltered, ...voicedFiltered];
+					const all = [...baseFiltered, ...voicedFiltered, ...connectFiltered];
 					if (all.length === 0) {
 						currentSet = [];
 						} else {
@@ -513,7 +592,7 @@
 						});
 					}
 					} else {
-					currentSet = [...baseFiltered, ...voicedFiltered];
+					currentSet = [...baseFiltered, ...voicedFiltered,...connectFiltered];
 				}
 				
 				shuffleQuestions();
@@ -527,6 +606,7 @@
 				const toggleButton = document.getElementById("modeToggle");
 				handleGroupCheckboxLogic("group");
                 handleGroupCheckboxLogic("voicedGroup");
+				handleGroupCheckboxLogic("connectChar");
 				if (savedTheme === "dark") {
 					document.body.classList.add("dark");
 					toggleButton.textContent = "☀️";
@@ -607,22 +687,6 @@
 				toggleButton.textContent = isDark ? "☀️" : "🌙";
 			}
 			
-			
-			window.addEventListener("DOMContentLoaded", () => {
-				const savedTheme = localStorage.getItem("theme");
-				const toggleButton = document.getElementById("modeToggle");
-				
-				if (savedTheme === "dark") {
-					document.body.classList.add("dark");
-					toggleButton.textContent = "☀️";
-					} else {
-					toggleButton.textContent = "🌙";
-				}
-				
-				selectGroup();
-			});
-			
-			
 			function updateJapaneseFont() {
 				const selectedFont = document.getElementById("jpFont").value;
 				document.getElementById("question").style.fontFamily = selectedFont;
@@ -648,6 +712,7 @@
 			function handleGroupCheckboxLogic(groupName) {
 				const checkboxes = document.querySelectorAll(`input[name="${groupName}"]`);
 				const allCheckbox = Array.from(checkboxes).find(cb => cb.value === "all");
+				const noneCheckbox = Array.from(checkboxes).find(cb => cb.value === "none"); // ⬅️ thêm
 				
 				checkboxes.forEach(cb => {
 					cb.addEventListener("change", () => {
@@ -656,19 +721,35 @@
 								if (c !== cb) c.checked = false;
 							});
 							} else if (cb.value !== "all" && cb.checked) {
-							allCheckbox.checked = false;
+							if (allCheckbox) allCheckbox.checked = false;
 						}
 						
-						// Không checkbox nào được chọn → bật lại "Tất cả"
+						// Nếu chọn "Trống" → bỏ các ô khác
+						if (cb.value === "none" && cb.checked) {
+							checkboxes.forEach(c => {
+								if (c !== cb) c.checked = false;
+							});
+						}
+						
+						// Nếu chọn các ô khác → bỏ "Trống"
+						if (cb.value !== "none" && cb.checked) {
+							if (noneCheckbox) noneCheckbox.checked = false;
+						}
+						
+						// Nếu không checkbox nào được chọn → bật lại "Tất cả"
 						const checkedCount = Array.from(checkboxes).filter(c => c.checked).length;
-						if (checkedCount === 0) {
+						if (checkedCount === 0 && allCheckbox) {
 							allCheckbox.checked = true;
 						}
 						
-						selectGroup(); // Cập nhật
+						selectGroup(); // cập nhật danh sách
 					});
 				});
 			}
+			
+			
+			
+			
 			document.addEventListener("click", function (event) {
 				const isDropdownButton = event.target.matches(".dropdown-btn");
 				const dropdowns = document.querySelectorAll(".dropdown-content");
